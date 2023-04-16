@@ -4,7 +4,7 @@ import {
   getPublicContents,
   getUserContents,
   publishContent,
-  deleteContent,
+  softDeleteContent,
   createContent,
   saveContent
 } from './content.service'
@@ -50,7 +50,7 @@ export const save = (req: Request, res: Response, next: Errback) => {
 }
 
 export const deleteSingle = (req: Request, res: Response, next: Errback) => {
-  deleteContent(req.params.id)
+  softDeleteContent(req.params.id)
     .then(() => res.json({ message: 'Deleted' }))
     .catch((err) => {
       next(err)

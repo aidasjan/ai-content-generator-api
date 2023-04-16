@@ -49,8 +49,15 @@ export const saveContent = async (id: string) => {
   return null
 }
 
-export const deleteContent = (id: string) => {
-  return ContentModel.findByIdAndDelete(id)
+export const softDeleteContent = async (id: string) => {
+  const existingContent = await ContentModel.findById(id)
+  if (existingContent){
+    existingContent.isSaved = false
+    existingContent.isPublic = false
+    await existingContent.save()
+    return existingContent
+  }
+  return null
 }
 
 export const deleteContentsByCategory = (id: string) => {
