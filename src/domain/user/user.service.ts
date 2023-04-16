@@ -5,9 +5,30 @@ import bcrypt from 'bcrypt'
 import { getRoleByCode } from '../role/role.service'
 import { type Role } from '../role/types'
 import { deleteContentsByUser } from '../content'
+import { HttpError } from '../../utils/errors'
 
 const findUserByEmail = (email: string) => {
   return UserModel.findOne({ email }).populate('role')
+}
+
+const checkRegistrationWhitelist = (
+  email: string,
+  registrationWhitelist: string
+) => {
+  const whitelistArr = registrationWhitelist.split(',')
+  for (let i = 0; i < whitelistArr.length; i++) {
+    if (whitelistArr[i].startsWith('*')) {
+      const endOfString = whitelistArr[i].substring(1)
+      if (email.endsWith(endOfString)) {
+        return true
+      }
+    } else {
+      if (email === whitelistArr[i].trim()) {
+        return true
+      }
+    }
+  }
+  return false
 }
 
 export const getAllUsers = () => {
@@ -46,6 +67,19 @@ export const loginUser = async (email: string, password: string) => {
 }
 
 export const registerUser = async (userData: User, password: string) => {
+  const registrationWhitelist = process.env.REGISTRATION_WHITELIST
+  if (registrationWhitelist) {
+    const isAllowed = checkRegistrationWhitelist(
+      userData.email,
+      registrationWhitelist
+    )
+    if (!isAllowed) {
+      throw new HttpError(
+        'This user is not allowed to register. Contact the developer of this application if you think this is an issue.',
+        400
+      )
+    }
+  }
   const salt = await bcrypt.genSalt(10)
   const hashedPassword = await bcrypt.hash(password, salt)
   const role = await getRoleByCode('user')
