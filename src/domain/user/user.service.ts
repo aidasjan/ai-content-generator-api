@@ -80,6 +80,12 @@ export const registerUser = async (userData: User, password: string) => {
       )
     }
   }
+
+  const existingUser = await UserModel.findOne({ email: userData.email })
+  if (existingUser) {
+    throw new HttpError('Cannot register this user', 400)
+  }
+
   const salt = await bcrypt.genSalt(10)
   const hashedPassword = await bcrypt.hash(password, salt)
   const role = await getRoleByCode('user')
