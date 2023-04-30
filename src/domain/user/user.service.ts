@@ -11,6 +11,10 @@ const findUserByEmail = (email: string) => {
   return UserModel.findOne({ email }).populate('role')
 }
 
+const checkPassword = (password: string) => {
+  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(password);
+} 
+
 const checkRegistrationWhitelist = (
   email: string,
   registrationWhitelist: string
@@ -79,6 +83,11 @@ export const registerUser = async (userData: User, password: string) => {
         400
       )
     }
+  }
+
+  const isPasswordValid = checkPassword(password)
+  if (!isPasswordValid) {
+    throw new HttpError('Password is too weak. It must be at least 8 symbols long, including lowercase, uppercase letters and digits.', 400)
   }
 
   const existingUser = await UserModel.findOne({ email: userData.email })
