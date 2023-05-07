@@ -1,3 +1,4 @@
+import { Types } from 'mongoose'
 import { deleteContentsByCategory } from '../content'
 import CategoryModel from './category.model'
 import { type Category } from './types'
@@ -24,6 +25,13 @@ export const addCategory = async (resultData: Category) => {
   const result = new CategoryModel(resultData)
   await result.save()
   return result
+}
+
+export const editCategory = async (id: string, data: Category) => {
+  return await CategoryModel.findByIdAndUpdate(id, {
+    title: data.title,
+    parent: data.parent ? new Types.ObjectId(data.parent) : null
+  })
 }
 
 export const deleteCategory = async (id: string) => {

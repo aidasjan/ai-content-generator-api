@@ -2,6 +2,7 @@ import { type Errback, type Request, type Response } from 'express'
 import {
   getAllCategories,
   addCategory,
+  editCategory,
   deleteCategory
 } from './category.service'
 
@@ -15,6 +16,14 @@ export const getAll = (req: Request, res: Response, next: Errback) => {
 
 export const addNew = (req: Request, res: Response, next: Errback) => {
   addCategory(req.body)
+    .then((result) => res.json(result))
+    .catch((err) => {
+      next(err)
+    })
+}
+
+export const edit = (req: Request, res: Response, next: Errback) => {
+  editCategory(req.params.id, req.body)
     .then((result) => res.json(result))
     .catch((err) => {
       next(err)
