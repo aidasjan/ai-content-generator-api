@@ -12,8 +12,8 @@ const findUserByEmail = (email: string) => {
 }
 
 const checkPassword = (password: string) => {
-  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(password);
-} 
+  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(password)
+}
 
 const checkRegistrationWhitelist = (
   email: string,
@@ -87,7 +87,10 @@ export const registerUser = async (userData: User, password: string) => {
 
   const isPasswordValid = checkPassword(password)
   if (!isPasswordValid) {
-    throw new HttpError('Password is too weak. It must be at least 8 symbols long, including lowercase, uppercase letters and digits.', 400)
+    throw new HttpError(
+      'Password is too weak. It must be at least 8 symbols long, including lowercase, uppercase letters and digits.',
+      400
+    )
   }
 
   const existingUser = await UserModel.findOne({ email: userData.email })
@@ -111,4 +114,12 @@ export const registerUser = async (userData: User, password: string) => {
 export const deleteUser = async (id: string) => {
   await deleteContentsByUser(id)
   return await UserModel.findByIdAndDelete(id)
+}
+
+export const elevateUserRole = async (id: string) => {
+  await deleteContentsByUser(id)
+  const role = await getRoleByCode('admin')
+  return await UserModel.findByIdAndUpdate(id, {
+    role: role?._id
+  })
 }

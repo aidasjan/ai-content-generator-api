@@ -3,7 +3,8 @@ import {
   registerUser,
   getAllUsers,
   loginUser,
-  deleteUser
+  deleteUser,
+  elevateUserRole
 } from './user.service'
 
 export const getAll = (req: Request, res: Response, next: Errback) => {
@@ -40,6 +41,14 @@ export const login = (req: Request, res: Response, next: Errback) => {
 export const deleteSingle = (req: Request, res: Response, next: Errback) => {
   deleteUser(req.params.id)
     .then(() => res.json({ message: 'Deleted' }))
+    .catch((err) => {
+      next(err)
+    })
+}
+
+export const makeAdmin = (req: Request, res: Response, next: Errback) => {
+  elevateUserRole(req.params.id)
+    .then((result) => res.json(result))
     .catch((err) => {
       next(err)
     })
